@@ -1,0 +1,1 @@
+module.exports = "https://doctruyen3qpro.com/"

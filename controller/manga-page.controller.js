@@ -2,7 +2,7 @@ const AppController = require("./app.controller");
 const got = require("got");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-
+const url_config = require("../model/config-url");
 // const { param } = require("../routes/api");
 
 class MangaPageController extends AppController {
@@ -18,27 +18,28 @@ class MangaPageController extends AppController {
   }
 
   async getInforsComic() {
-    
+
     let id = this.req.params.id;
 
     console.log('id',id)
 
-    const url = `http://www.nettruyenpro.com/truyen-tranh/${id}`;
+    const url = `${url_config}truyen-tranh/${id}`;
+    console.log('url: ', url)
     let htmlContent = await got(url);
     let dom = new JSDOM(htmlContent.body);
 
     let obj ={}
 
     let title_el = await dom.window.document.querySelector(
-      "#item-detail .title-detail"
+      "#comic-detail .title-manga"
     );
 
     if(title_el) {
-      obj.title = title_el.textContent
+      obj.title = title_el.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim()
     }
 
     let thumbnail_el = await dom.window.document.querySelector(
-      "#item-detail .detail-info .col-image img"
+      "#comic-detail .overview-comic .image-info img"
     );
 
     if(thumbnail_el) {
@@ -46,39 +47,39 @@ class MangaPageController extends AppController {
     }
 
     let author_el = await dom.window.document.querySelector(
-      "#item-detail .detail-info .col-info .list-info .author p:last-child"
+      "#comic-detail .overview-comic .comic-right .info-detail-comic .author p:last-child"
     );
 
     if(author_el) {
-      obj.author = author_el.textContent
+      obj.author = author_el.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim()
     }
 
     let status_el = await dom.window.document.querySelector(
-      "#item-detail .detail-info .col-info .list-info .status p:last-child"
+      "#comic-detail .overview-comic .comic-right .info-detail-comic .status p:last-child"
     );
 
     if(status_el) {
-      obj.status = status_el.textContent
+      obj.status = status_el.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim()
     }
 
     let cate_el = await dom.window.document.querySelector(
-      "#item-detail .detail-info .col-info .list-info .kind p:last-child"
+      "#comic-detail .overview-comic .comic-right .info-detail-comic .category p:last-child"
     );
 
     if(cate_el) {
-      obj.category = cate_el.textContent
+      obj.category = cate_el.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim()
     }
 
     let desc_el = await dom.window.document.querySelector(
-      "#item-detail .detail-content p"
+      "#comic-detail .summary-content p"
     );
 
     if(desc_el) {
-      obj.desc = desc_el.textContent
+      obj.desc = desc_el.textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim()
     }
 
     let lst_chapter_el = await dom.window.document.querySelectorAll(
-      "#item-detail .list-chapter ul li"
+      "#comic-detail .list-chapter ul li"
     );
 
     let arr_chapter = []
@@ -93,13 +94,12 @@ class MangaPageController extends AppController {
         let temp_lst = link.split('truyen-tranh/')
         obj.path = temp_lst[1]
 
-        obj.updated = lst_chapter_el[i].querySelector('div:nth-child(2)').textContent
+        obj.updated = lst_chapter_el[i].querySelector('div:nth-child(2)').textContent.replace(/[\n\r]+|[\s]{2,}/g, ' ').trim()
 
         arr_chapter.push(obj)
       }
     }
     obj.arr_chapter = arr_chapter
-    console.log('obj: ',obj)
 
     let rs = {
       data: obj

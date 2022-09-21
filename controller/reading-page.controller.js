@@ -2,6 +2,7 @@ const AppController = require("./app.controller");
 const got = require("got");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const url_config = require("../model/config-url");
 
 // const { param } = require("../routes/api");
 
@@ -24,26 +25,28 @@ class ReadingPageController extends AppController {
 
     console.log('id path: ',id)
 
-    const url = `http://www.nettruyenpro.com/truyen-tranh/${id}`;
+    const url = `${url_config}truyen-tranh/${id}`;
     let htmlContent = await got(url);
     let dom = new JSDOM(htmlContent.body);
 
     let list_el = await dom.window.document.querySelectorAll(
-      ".reading-detail .page-chapter"
+      ".list-image-detail .page-chapter"
     );
 
     let arr_images = []
     if(list_el.length > 0) {
       let leng = list_el.length
       for(let i =0 ;i<leng;i++) {
-        let url = 'http:' + list_el[i].querySelector('img').getAttribute('src')
-        let link = 'https://cors-bypasser.up.railway.app/?url=' + url + '&origin=http://www.nettruyenpro.com/'
-
-        arr_images.push(link)
+        // let url = 'http:' + list_el[i].querySelector('img').getAttribute('src')
+        let url = list_el[i].querySelector('img').getAttribute('src');
+        // let link = 'https://cors-bypasser.up.railway.app/?url=' + url + '&origin=http://www.nettruyenpro.com/'
+        // don't need bypass cors
+        if(url && !url.includes(url_config)) {
+          let link = url;
+          arr_images.push(link)
+        }
       }
     }
-
-    console.log('arr_images.length: ',arr_images.length)
 
     let nav_el = await dom.window.document.querySelector(
       ".breadcrumb li:nth-child(3) a"
@@ -56,11 +59,9 @@ class ReadingPageController extends AppController {
       let temp_lst = link.split('truyen-tranh/')
       nav_obj.path = temp_lst[1]
     }
-    
-    console.log('nav_obj: ',nav_obj)
 
     let link_comic_el = await dom.window.document.querySelector(
-      ".reading .top .txt-primary a"
+      ".chapter-info a"
     );
 
     let link_href = null
@@ -68,7 +69,6 @@ class ReadingPageController extends AppController {
       link_href = link_comic_el.getAttribute("href")
     }
 
-    console.log("link_href: ",link_href)
     let arr_chapter = []
     let recent_chapter = {}
     if(link_href) {
@@ -77,7 +77,7 @@ class ReadingPageController extends AppController {
       let dom_2 = new JSDOM(htmlContent_2.body);
 
       let lst_chapter_el = await dom_2.window.document.querySelectorAll(
-        "#item-detail .list-chapter ul li"
+        "#comic-detail .list-chapter ul li"
       );
   
       if(lst_chapter_el.length > 0) {
@@ -100,9 +100,6 @@ class ReadingPageController extends AppController {
           arr_chapter.push(obj)
         }
       }
-
-      console.log("arr_chapter: ",arr_chapter)
-      console.log('recent_chapter: ',recent_chapter)
 
     }  
 

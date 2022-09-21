@@ -2,6 +2,7 @@ const AppController = require("./app.controller");
 const got = require("got");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+const url_config = require("../model/config-url");
 
 // const { param } = require("../routes/api");
 
@@ -19,27 +20,25 @@ class FindPageController extends AppController {
 
   async getListComics() {
     let params = this.req.query
-    console.log('params: ',params)
     let type = params.type
     let keyword = params.keyword
-    // console.log('type: ', type)
 
     let url = null
-    if(keyword != 'undefined') {
-      url = "http://www.nettruyenpro.com/tim-truyen?keyword="+keyword
-    }else {
-      if(type != 'none') {
-        url = "http://www.nettruyenpro.com/tim-truyen/" + type;
-      }else {
-        url = "http://www.nettruyenpro.com/tim-truyen";
+    if (keyword && keyword != 'undefined') {
+      url = `${url_config}tim-truyen?keyword=` + keyword
+    } else {
+      if (type && type != 'none') {
+        url = `${url_config}tim-truyen/` + type;
+      } else {
+        url = `${url_config}tim-truyen`;
       }
     }
 
     let htmlContent = await got(url);
     let dom = new JSDOM(htmlContent.body);
-  
+ 
     let lst_comic_el = await dom.window.document.querySelectorAll(
-      ".items .row .item"
+      ".main-left .row .item-manga"
     );
 
     let arr_comic = [];
@@ -48,15 +47,15 @@ class FindPageController extends AppController {
       let obj = {};
       let item_el = lst_comic_el[i];
 
-      let title = await item_el.querySelector(".box_tootip .box_li .title")
+      let title = await item_el.querySelector(".pop-up .manga-information .title span")
         .textContent;
       obj.title = title;
 
-      let chapter_new = await item_el.querySelector('.chapter a').textContent
+      let chapter_new = await item_el.querySelector('.chapter-detail a').textContent
       obj.chapter = chapter_new
 
       let link_el = await item_el.querySelector(
-        ".box_tootip .box_li .box_img a"
+        ".image-item a"
       );
       if (link_el) {
         obj.link = link_el.getAttribute("href");
@@ -66,19 +65,19 @@ class FindPageController extends AppController {
       }
 
       let thumbnail_el = await item_el.querySelector(
-        ".box_tootip .box_li .box_img a img"
+        ".pop-up .image-mini img"
       );
       if (thumbnail_el) {
         obj.thumbnail = thumbnail_el.getAttribute("data-original");
       }
 
       let lst_infors_el = await item_el.querySelectorAll(
-        ".box_tootip .box_li .message_main p"
+        ".pop-up .manga-information .synopsis p"
       );
       let leng_infors = lst_infors_el.length;
 
-      let desc_el = await item_el.querySelector(".box_tootip .box_li .box_text")
-      if(desc_el) {
+      let desc_el = await item_el.querySelector(".pop-up .manga-information .content-manga p")
+      if (desc_el) {
         obj.desc = desc_el.textContent
       }
 
@@ -99,7 +98,7 @@ class FindPageController extends AppController {
           updated = updated.replace("Ngày cập nhật:", "");
           updated = updated.split("\n").join("");
           obj.updated = updated;
-        } else if(item_infor.textContent.includes("Lượt xem:")) {
+        } else if (item_infor.textContent.includes("Lượt xem:")) {
           let view_count = item_infor.textContent;
           view_count = view_count.replace("Lượt xem:", "");
           view_count = view_count.split("\n").join("");
@@ -117,20 +116,20 @@ class FindPageController extends AppController {
   }
 
   async getListCategory() {
-    const url = "http://www.nettruyenpro.com/tim-truyen";
+    const url = `${url_config}tim-truyen`;
 
     let htmlContent = await got(url);
     let dom = new JSDOM(htmlContent.body);
 
     let lst_category_el = await dom.window.document.querySelectorAll(
-      ".right-side .ModuleContent ul li a"
+      ".content-search-right .categories-detail ul li a"
     );
 
     let arr_cate = []
     let leng_nav = lst_category_el.length
-    if(leng_nav >0) {
-      for(let i=1;i< leng_nav;i++) {
-        let obj ={}
+    if (leng_nav > 0) {
+      for (let i = 1; i < leng_nav; i++) {
+        let obj = {}
         obj.label = lst_category_el[i].textContent.trim()
         let link = lst_category_el[i].getAttribute('href')
         let temp_lst = link.split('tim-truyen/')

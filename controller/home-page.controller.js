@@ -2,7 +2,7 @@ const AppController = require("./app.controller");
 const got = require("got");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
-
+const url = require("../model/config-url");
 // const { param } = require("../routes/api");
 
 class HomePageController extends AppController {
@@ -19,30 +19,28 @@ class HomePageController extends AppController {
 
   async getListNewestComic() {
 
-    const url = "http://www.nettruyenpro.com/";
-
     let htmlContent = await got(url);
     let dom = new JSDOM(htmlContent.body);
-  
+
     let lst_comic_el = await dom.window.document.querySelectorAll(
-      "#ctl00_divCenter .item"
+      "#home .item-manga"
     );
 
     let arr_comic = [];
-   
+
     for (let i = 0; i < 10; i++) {
       let obj = {};
       let item_el = lst_comic_el[i];
 
-      let title = await item_el.querySelector(".box_tootip .box_li .title")
+      let title = await item_el.querySelector(".pop-up .manga-information .title span")
         .textContent;
       obj.title = title;
 
-      let chapter_new = await item_el.querySelector('.chapter a').textContent
+      let chapter_new = await item_el.querySelector('.chapter-detail a').textContent
       obj.chapter = chapter_new
 
       let link_el = await item_el.querySelector(
-        ".box_tootip .box_li .box_img a"
+        ".image-item a"
       );
       if (link_el) {
         obj.link = link_el.getAttribute("href");
@@ -52,19 +50,19 @@ class HomePageController extends AppController {
       }
 
       let thumbnail_el = await item_el.querySelector(
-        ".box_tootip .box_li .box_img a img"
+        ".pop-up .image-mini img"
       );
       if (thumbnail_el) {
         obj.thumbnail = thumbnail_el.getAttribute("data-original");
       }
 
       let lst_infors_el = await item_el.querySelectorAll(
-        ".box_tootip .box_li .message_main p"
+        ".pop-up .manga-information .synopsis p"
       );
       let leng_infors = lst_infors_el.length;
 
-      let desc_el = await item_el.querySelector(".box_tootip .box_li .box_text")
-      if(desc_el) {
+      let desc_el = await item_el.querySelector(".pop-up .manga-information .content-manga p")
+      if (desc_el) {
         obj.desc = desc_el.textContent
       }
 
@@ -85,7 +83,7 @@ class HomePageController extends AppController {
           updated = updated.replace("Ngày cập nhật:", "");
           updated = updated.split("\n").join("");
           obj.updated = updated;
-        } else if(item_infor.textContent.includes("Lượt xem:")) {
+        } else if (item_infor.textContent.includes("Lượt xem:")) {
           let view_count = item_infor.textContent;
           view_count = view_count.replace("Lượt xem:", "");
           view_count = view_count.split("\n").join("");
@@ -99,6 +97,7 @@ class HomePageController extends AppController {
     let rs = {
       data: arr_comic,
     };
+
     return this.responseJson({ data: rs });
   }
 }
