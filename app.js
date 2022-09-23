@@ -1,5 +1,5 @@
 var express = require('express');
-var fileUpload = require('express-fileupload');
+// var fileUpload = require('express-fileupload');
 const path = require("path");
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -100,9 +100,9 @@ app.use(function(req, res, next) {
  next();
 });
 
-app.use(fileUpload({
-  createParentPath: true
-}))
+// app.use(fileUpload({
+//   createParentPath: true
+// }))
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

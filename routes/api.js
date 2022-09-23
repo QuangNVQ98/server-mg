@@ -11,14 +11,14 @@ const FindPageController = require("../controller/find-page.controller");
 
 let router = express.Router();
 
-router.get('/get-file', function(req, res){
-  const filePath = req.query.path;
-  const imgPath = path.resolve('uploads', filePath);
-  if (fs.existsSync(imgPath)) {
-    return res.sendFile(imgPath);
-  } 
-  return res.send('Không tim thấy file !');
-});
+// router.get('/get-file', function(req, res){
+//   const filePath = req.query.path;
+//   const imgPath = path.resolve('uploads', filePath);
+//   if (fs.existsSync(imgPath)) {
+//     return res.sendFile(imgPath);
+//   } 
+//   return res.send('Không tim thấy file !');
+// });
 
 router.use(function (req, res, next) {
   if (
