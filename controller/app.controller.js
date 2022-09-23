@@ -10,12 +10,12 @@ class AppController {
     
     if (this.req.headers.authorization !== undefined && this.req.headers.authorization != '') {
       try {
-        const verified = jwt.verify(this.req.headers.authorization, process.env.JWT_KEY);
+        // const verified = jwt.verify(this.req.headers.authorization, process.env.JWT_KEY);
 
-        if (verified) {
-          let decoded = jwt.decode(this.req.headers.authorization);
-          this.appUser = decoded ? decoded.profile : null;
-        }
+        // if (verified) {
+        //   let decoded = jwt.decode(this.req.headers.authorization);
+        //   this.appUser = decoded ? decoded.profile : null;
+        // }
       } catch (error) {
         
       }     

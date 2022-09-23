@@ -56,33 +56,33 @@ class AuthController extends AppController {
         }
     }
 
-    async checkToken() {
-        try {
-            let params = this.req.body;
+    // async checkToken() {
+    //     try {
+    //         let params = this.req.body;
 
-            if(!params.token ) return this.responseJson({error_code: 101});
+    //         if(!params.token ) return this.responseJson({error_code: 101});
 
-            jwt.verify(params.token, process.env.JWT_KEY);
+    //         jwt.verify(params.token, process.env.JWT_KEY);
 
-            let decoded = jwt.decode(params.token);
+    //         let decoded = jwt.decode(params.token);
 
-            if (!decoded) return this.responseJson({error_code: 203});
+    //         if (!decoded) return this.responseJson({error_code: 203});
 
-            const acc = await this.AccountModel.findById(decoded.id);
+    //         const acc = await this.AccountModel.findById(decoded.id);
 
-            if (!acc) return this.responseJson({error_code: 201});
+    //         if (!acc) return this.responseJson({error_code: 201});
             
-            const rs = this.returnResultToClient(acc)
+    //         const rs = this.returnResultToClient(acc)
 
-            return this.responseJson({data: {
-                token: params.token,
-                profile: rs
-            }});
-        } catch (error) {
-            console.log(error);
-            return this.responseJson({error_code: 102});
-        }
-    }
+    //         return this.responseJson({data: {
+    //             token: params.token,
+    //             profile: rs
+    //         }});
+    //     } catch (error) {
+    //         console.log(error);
+    //         return this.responseJson({error_code: 102});
+    //     }
+    // }
 
     returnResultToClient(acc) {
         return {

@@ -27,10 +27,10 @@ router.use(function (req, res, next) {
   ) {
     let appController = new AppController(req, res);
     try {
-      let decoded = jwt.verify(
-        req.headers.authorization,
-        process.env.JWT_KEY || "dev"
-      );
+      // let decoded = jwt.verify(
+      //   req.headers.authorization,
+      //   process.env.JWT_KEY || "dev"
+      // );
       next();
     } catch (err) {
       return appController.responseJson({ error_code: 203 });
