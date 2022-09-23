@@ -19,13 +19,13 @@ class HomePageController extends AppController {
 
   async getListNewestComic() {
 
-    let htmlContent
-    try {
-      htmlContent = await got(url);
-    } catch (error) {
-      console.log('error12: ', error)
-    }
-    console.log('done')
+    // let htmlContent
+    // try {
+    let htmlContent = await got(url);
+    // } catch (error) {
+      // console.log('error12: ', error)
+    // }
+    console.log('htmlContent: ', htmlContent)
     // let htmlContent = await got(url);
     let dom = new JSDOM(htmlContent.body);
 
